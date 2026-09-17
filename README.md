@@ -68,11 +68,19 @@ Use `make help` to list all available development commands.
 ## Build Your Application
 
 Feature code lives under `modules/`.
-Create a package-based module with:
+Generate a module, then add more models to it:
 
 ```sh
-make create-app NAME=blog
+make module shop                    # modules/shop with a Shop model
+make module shop.product            # adds models/product.py (Product)
+make module shop.catalog.           # adds an empty catalog/ folder (ends with . or /)
+make module shop.catalog.category   # adds models/catalog/category.py (Category)
+make module shop/order/invoice      # adds models/order/invoice.py (Invoice)
+make module payment/                # modules/payment without a model
 ```
+
+Each run creates the model, Unfold admin, and a starter test, exports them from the package `__init__.py` files, and registers the module in `INSTALLED_APPS`.
+Add fields, then run `make makemigrations` and `make migrate`.
 
 The template intentionally leaves product decisions such as APIs, background jobs, cache usage, and social authentication to your application.
 

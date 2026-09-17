@@ -1,4 +1,4 @@
-.PHONY: help install sync sync-all run migrate makemigrations shell superuser test check deploy-check collectstatic clean
+.PHONY: help install sync sync-all run migrate makemigrations shell superuser test check deploy-check collectstatic clean module
 
 PYTHON ?= uv run python
 MANAGE ?= $(PYTHON) manage.py
@@ -11,21 +11,29 @@ else
     PORT ?= 8000
 endif
 
+# `make module shop.product` passes the module name as a second goal; turn it into a no-op.
+# A catch-all rule is needed because make 3.81 cannot match goals ending in `/`.
+ifeq (module,$(firstword $(MAKECMDGOALS)))
+    MODULE_NAME := $(word 2,$(MAKECMDGOALS))
+%:
+	@:
+endif
+
 help:
 	@printf '%s\n' \
 		'Common targets:' \
-		'  make install            Install dependencies' \
-		'  make run                Run development server' \
-		'  make migrate            Apply migrations' \
-		'  make makemigrations     Create migrations' \
-		'  make shell              Open Django shell' \
-		'  make superuser          Create admin user' \
-		'  make test               Run tests' \
-		'  make check              Run system checks' \
-		'  make deploy-check       Run deployment checks' \
-		'  make collectstatic      Collect static files' \
-		'  make clean              Remove Python caches' \
-		'  make create-app NAME=x  Create a package-based module'
+		'  make install                 Install dependencies' \
+		'  make run                     Run development server' \
+		'  make migrate                 Apply migrations' \
+		'  make makemigrations          Create migrations' \
+		'  make shell                   Open Django shell' \
+		'  make superuser               Create admin user' \
+		'  make test                    Run tests' \
+		'  make check                   Run system checks' \
+		'  make deploy-check            Run deployment checks' \
+		'  make collectstatic           Collect static files' \
+		'  make clean                   Remove Python caches' \
+		'  make module NAME             Create a module or model (run without NAME for examples)'
 
 install sync:
 	uv sync
@@ -65,9 +73,21 @@ clean:
 	find . -type d -name __pycache__ -prune -exec rm -rf {} +
 	find . -type f \( -name '*.pyc' -o -name '*.pyo' \) -delete
 
-create-app:
-	@if [ -z "$(NAME)" ]; then \
-		echo "Error: specify a module name. Usage: make create-app NAME=my_module"; \
+module:
+	@if [ -z "$(or $(MODULE_NAME),$(NAME))" ]; then \
+		printf '%s\n' \
+			'Usage: make module <module>[.<folder>...][.<model>]' \
+			'' \
+			'Separate parts with . or /. End with . or / to create a folder without a model.' \
+			'Each model gets models/, admin/, and tests/ files and is exported automatically.' \
+			'' \
+			'Example: an online shop' \
+			'  make module shop                   modules/shop/ with models/shop.py (Shop)' \
+			'  make module shop.product           models/product.py (Product)' \
+			'  make module shop.catalog.          models/catalog/ folder, no model' \
+			'  make module shop.catalog.category  models/catalog/category.py (Category)' \
+			'  make module shop/order/invoice     models/order/invoice.py (Invoice)' \
+			'  make module payment/               modules/payment/ without a model'; \
 		exit 1; \
 	fi
-	$(PYTHON) scripts/create_module.py $(NAME)
+	$(MANAGE) make_module $(or $(MODULE_NAME),$(NAME))
