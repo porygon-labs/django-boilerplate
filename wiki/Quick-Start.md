@@ -8,17 +8,21 @@ This path runs Django on the host with live reload while PostgreSQL, Redis, Mail
 - `mise` or another Python version manager
 - `uv`
 - Docker Engine with Docker Compose v2
+- macOS, Linux, or Windows with WSL 2
 
 ## Start the Project
 
 ```sh
-cp .env.example .env
-mise install
-uv sync --group cache
-docker compose -f compose.yaml -f compose.local.yaml up -d db redis mailpit adminer
-uv run python manage.py migrate
-uv run python manage.py runserver
+make setup
+make run
 ```
+
+`make setup` creates `.env` from `.env.example` when missing, installs Python and dependencies, starts local services, and applies migrations.
+It is safe to run again.
+
+On Windows, run these commands inside [WSL 2](https://learn.microsoft.com/windows/wsl/install).
+The Makefile uses POSIX shell commands, so it does not run from PowerShell or `cmd`.
+Without WSL, call the Django commands directly, for example `uv run python manage.py make_module shop.product`.
 
 Open <http://127.0.0.1:8000/>.
 
@@ -35,8 +39,10 @@ Local services:
 ## Create an Administrator
 
 ```sh
-uv run python manage.py createsuperuser
+make superuser
 ```
+
+Stop the local services with `make services-down`, and start them again with `make services`.
 
 ## Run Checks
 

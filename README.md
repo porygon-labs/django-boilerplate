@@ -39,13 +39,16 @@ Browse the [GitHub Wiki](https://github.com/fahmiauliarahman/django-boilerplate/
 Install Python through [mise](https://mise.jdx.dev/) or your preferred version manager, then run:
 
 ```sh
-cp .env.example .env
-mise install
-uv sync --group cache
-docker compose -f compose.yaml -f compose.local.yaml up -d db redis mailpit adminer
-uv run python manage.py migrate
-uv run python manage.py runserver
+make setup
+make run
 ```
+
+`make setup` creates `.env` from `.env.example` when missing, installs Python and dependencies, starts local services, and applies migrations.
+It is safe to run again.
+
+On Windows, run these commands inside [WSL 2](https://learn.microsoft.com/windows/wsl/install).
+The Makefile uses POSIX shell commands, so it does not run from PowerShell or `cmd`.
+Without WSL, call the Django commands directly, for example `uv run python manage.py make_module shop.product`.
 
 Open <http://127.0.0.1:8000/>.
 This runs Django on the host with live reload while PostgreSQL, Redis, Mailpit, and Adminer run in containers.
@@ -53,7 +56,7 @@ This runs Django on the host with live reload while PostgreSQL, Redis, Mailpit, 
 Create an administrator when needed:
 
 ```sh
-uv run python manage.py createsuperuser
+make superuser
 ```
 
 Run the project checks:

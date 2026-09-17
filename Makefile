@@ -1,7 +1,9 @@
-.PHONY: help install sync sync-all run migrate makemigrations shell superuser test check deploy-check collectstatic clean module
+.PHONY: help setup services services-down install sync sync-all run migrate makemigrations shell superuser test check deploy-check collectstatic clean module
 
 PYTHON ?= uv run python
 MANAGE ?= $(PYTHON) manage.py
+COMPOSE ?= docker compose -f compose.yaml -f compose.local.yaml
+LOCAL_SERVICES ?= db redis mailpit adminer
 ENV_PORT := $(shell [ -f .env ] && grep '^APP_PORT=' .env | cut -d'=' -f2 | tr -d '"[:space:]')
 
 # 2. Use terminal environment PORT, otherwise the .env PORT, otherwise fallback to 8000
@@ -22,6 +24,9 @@ endif
 help:
 	@printf '%s\n' \
 		'Common targets:' \
+		'  make setup                   Prepare .env, dependencies, services, and database' \
+		'  make services                Start local PostgreSQL, Redis, Mailpit, and Adminer' \
+		'  make services-down           Stop local services' \
 		'  make install                 Install dependencies' \
 		'  make run                     Run development server' \
 		'  make migrate                 Apply migrations' \
@@ -34,6 +39,20 @@ help:
 		'  make collectstatic           Collect static files' \
 		'  make clean                   Remove Python caches' \
 		'  make module NAME             Create a module or model (run without NAME for examples)'
+
+setup:
+	@[ -f .env ] || { cp .env.example .env && echo "Created .env from .env.example"; }
+	@if command -v mise >/dev/null 2>&1; then mise install; else echo "mise not found; using the Python version uv selects"; fi
+	uv sync --group cache
+	$(MAKE) services
+	$(MANAGE) migrate
+	@echo "Setup complete. Run 'make superuser' to create an admin, then 'make run'."
+
+services:
+	$(COMPOSE) up -d --wait $(LOCAL_SERVICES)
+
+services-down:
+	$(COMPOSE) down
 
 install sync:
 	uv sync
