@@ -21,7 +21,7 @@ Browse the [GitHub Wiki](https://github.com/fahmiauliarahman/django-boilerplate/
 
 ## What's Included in the Stack
 
-- Python 3.14, Django 6.0, and PostgreSQL 18
+- Python 3.14, Django 6.1, and PostgreSQL 18
 - uv dependency management with a committed lockfile
 - Django Unfold admin interface
 - Gunicorn, Nginx, WhiteNoise, and HTTPS-ready Compose deployment
@@ -92,7 +92,7 @@ See [Extend the boilerplate](docs/extending.md) for a complete feature walkthrou
 ## Stack
 
 - Python 3.14
-- Django 6.0
+- Django 6.1
 - PostgreSQL 18
 - Redis 8
 - uv

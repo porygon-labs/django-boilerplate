@@ -5,23 +5,23 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
-    "django>=6.0.7",
+    "django>=6.1.2",
     "django-cleanup>=9.0.0",
     "django-environ>=0.14.0",
     "django-storages[boto3]>=1.14.6",
-    "django-unfold>=0.100.0",
-    "pillow>=12.3.0",
-    "psycopg2-binary>=2.9.12",
-    "whitenoise>=6.11.0",
+    "django-unfold>=0.110.0",
+    "pillow>=13.0.0",
+    "psycopg2-binary>=2.9.13",
+    "whitenoise>=6.12.0",
 ]
 
 [dependency-groups]
 cache = [
-    "redis>=8.0.1",
+    "redis>=8.1.0",
 ]
 dev = [
-    "django-debug-toolbar>=7.0.0",
+    "django-debug-toolbar>=8.0.0",
 ]
 prod = [
-    "gunicorn>=26.0.0",
+    "gunicorn>=26.2.0",
 ]
